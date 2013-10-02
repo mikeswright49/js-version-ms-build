@@ -1,0 +1,29 @@
+  <PropertyGroup>
+    <DateTimeDay>$([System.DateTime]::Now.Day)</DateTimeDay>
+    <DateTimeHour>$([System.DateTime]::Now.Hour)</DateTimeHour>
+	<ScriptsPath>~/Scripts-build$(DateTimeDay)$(DateTimeHour)/</ScriptsPath>
+  </PropertyGroup>
+ <Target Name="MinifyFiles" BeforeTargets="BeforeBuild" Condition="$(MinifyFiles)=='true'">
+    <ItemGroup>
+      <JSFilesToMinify Include="$(MSBuildProjectDirectory)\Scripts\debcom-build.js" />
+    </ItemGroup>
+    <Message Text="Minifying All Scripts to Scripts-build"  Importance="High"/>
+    <Exec Command="node $(MSBuildProjectDirectory)\Scripts\r.js -o %(JSFilesToMinify.Identity) dir=./Scripts-build$(DateTimeDay)$(DateTimeHour)" />
+    <CallTarget Targets="UpdateWebConfig" />
+  </Target>
+  <Target Name="MinifiedJsFiles" BeforeTargets="CopyAllFilesToSingleFolderForMsdeploy">
+    <ItemGroup>
+      <_CustomFiles Include="$(MSBuildProjectDirectory)\Scripts-build$(DateTimeDay)$(DateTimeHour)\**\*" />
+      <FilesForPackagingFromProject Include="%(_CustomFiles.Identity)">
+        <DestinationRelativePath>Scripts-build$(DateTimeDay)$(DateTimeHour)\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+  </Target>
+  <Target Name="UpdateWebConfig">
+      <Message Text="Updating Web Config"  Importance="High"/>
+	  <XmlPoke 
+		XmlInputPath="Web.config"
+		Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
+		Query="configuration/appSettings/add[@key = 'ScriptsPath']/@value"
+		Value="$(ScriptsPath)" />
+  </Target>
