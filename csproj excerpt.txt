@@ -5,7 +5,7 @@
   </PropertyGroup>
  <Target Name="MinifyFiles" BeforeTargets="BeforeBuild" Condition="$(MinifyFiles)=='true'">
     <ItemGroup>
-      <JSFilesToMinify Include="$(MSBuildProjectDirectory)\Scripts\debcom-build.js" />
+      <JSFilesToMinify Include="$(MSBuildProjectDirectory)\Scripts\project-build.js" />
     </ItemGroup>
     <Message Text="Minifying All Scripts to Scripts-build"  Importance="High"/>
     <Exec Command="node $(MSBuildProjectDirectory)\Scripts\r.js -o %(JSFilesToMinify.Identity) dir=./Scripts-build$(DateTimeDay)$(DateTimeHour)" />
